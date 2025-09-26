@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corações Sagrados - Novenas</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        /* Estilos personalizados */
+        :root {
+            --brand-red: #7c0909;
+        }
+        body {
+            font-family: 'EB Garamond', serif;
+            background-image: linear-gradient(to bottom, #ffffff 0%, #e0e0e0 25%, #c3c3c3 50%, #949da4 100%);
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4, .font-brand {
+            font-family: 'Cinzel Decorative', serif;
+        }
+        
+        /* --- NAVEGAÇÃO GLOBAL DE SANTOS --- */
+        /* Novo estilo Gótico para a barra de rolagem */
+        .saints-nav-container {
+            scrollbar-width: auto;
+            scrollbar-color: var(--brand-red) #e5e7eb; /* Cor do polegar e da trilha */
+        }
+        .saints-nav-container::-webkit-scrollbar {
+            height: 10px;
+        }
+        .saints-nav-container::-webkit-scrollbar-track {
+            background: #e5e7eb; /* Fundo da trilha (cinza claro) */
+        }
+        .saints-nav-container::-webkit-scrollbar-thumb {
+            background-color: var(--brand-red); /* Cor do polegar (vermelho) */
+            border-radius: 0; /* Cantos retos */
+        }
+
+        .saint-nav-item {
+            transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+            cursor: pointer;
+            flex-shrink: 0; /* Impede que os itens encolham */
+            width: 100px;
+        }
+        .saint-nav-item:not(.active) {
+            opacity: 0.7;
+        }
+        .saint-nav-item:hover {
+            opacity: 1;
+            transform: scale(1.05);
+        }
+        .saint-nav-item img {
+            border: 4px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        .saint-nav-item.active img {
+            border-color: var(--brand-red);
+            box-shadow: 0 0 15px rgba(124, 9, 9, 0.4);
+        }
+
+        /* Navegação de Meses */
+        .month-nav-btn {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 3px solid transparent;
+            font-weight: 700; /* bold */
+            padding-bottom: 0.25rem; /* pb-1 */
+        }
+        .month-nav-btn.active, .month-nav-btn:hover {
+            border-bottom-color: var(--brand-red);
+            color: var(--brand-red);
+        }
+
+        /* --- ESTILOS DA PÁGINA DA NOVENA --- */
+        .main-card {
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            position: relative;
+        }
+        .prose, .prose h3, .prose p, .prose blockquote { transition: color 0.4s ease; }
+        .litany-response, .text-stone-200 { transition: color 0.4s ease; }
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            font-family: 'Cinzel Decorative', serif;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .brand-border { transition: border-color 0.4s ease; }
+
+        .prose > blockquote:first-of-type + p::first-letter,
+        .prose > h4 + p::first-letter,
+        .day-specific-content > p:first-child::first-letter {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 4.5em; font-weight: bold; float: left;
+            line-height: 0.8; padding-top: 0.1em; margin-right: 0.1em;
+            transition: color 0.4s ease;
+        }
+        .litany-item {
+            display: flex; justify-content: space-between;
+            padding-top: 4px; padding-bottom: 4px;
+            transition: border-color 0.4s ease;
+        }
+
+        .theme-selector {
+            position: absolute; top: -14px; right: 20px;
+            display: flex; gap: 10px; padding: 6px 12px;
+            border-radius: 999px;
+        }
+        .theme-dot {
+            width: 20px; height: 20px; border-radius: 50%;
+            cursor: pointer; transition: all 0.2s ease;
+            border: 2px solid rgba(255,255,255,0.7);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .theme-dot:hover { transform: scale(1.15); }
+        .theme-dot.active {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9);
+        }
+        
+        /* Balão de Data */
+        .date-badge {
+            background-color: var(--brand-red);
+            color: white;
+            padding: 4px 16px;
+            border-radius: 9999px; /* pill shape */
+            font-size: 0.875rem; /* 14px */
+            font-weight: bold;
+            display: inline-block;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* --- DEFINIÇÕES DOS TEMAS --- */
+        .main-card.theme-default {
+            background-color: #949da4; color: #fafafa;
+        }
+        .main-card.theme-default .brand-red, .main-card.theme-default .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-default .prose > h4 + p::first-letter, .main-card.theme-default .day-specific-content > p:first-child::first-letter { color: var(--brand-red); }
+        .main-card.theme-default .text-stone-200, .main-card.theme-default .litany-response { color: #e7e5e4; }
+        .main-card.theme-default .tab-btn { color: #e7e5e4; }
+        .main-card.theme-default .tab-btn.active { color: #fafafa; border-bottom-color: var(--brand-red); }
+        .main-card.theme-default .border-white\/20, .main-card.theme-default .litany-item { border-color: rgba(255,255,255,0.2); }
+        .main-card.theme-default .brand-border { border-left-color: var(--brand-red); }
+
+        .main-card.theme-dark-gray {
+            background-color: #374151; color: #f3f4f6;
+        }
+        .main-card.theme-dark-gray .brand-red, .main-card.theme-dark-gray .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-dark-gray .prose > h4 + p::first-letter, .main-card.theme-dark-gray .day-specific-content > p:first-child::first-letter { color: #e5e7eb; }
+        .main-card.theme-dark-gray .text-stone-200, .main-card.theme-dark-gray .litany-response { color: #d1d5db; }
+        .main-card.theme-dark-gray .tab-btn { color: #d1d5db; }
+        .main-card.theme-dark-gray .tab-btn.active { color: #f9fafb; border-bottom-color: #f9fafb; }
+        .main-card.theme-dark-gray .border-white\/20, .main-card.theme-dark-gray .litany-item { border-color: rgba(255,255,255,0.2); }
+        .main-card.theme-dark-gray .brand-border { border-left-color: #e5e7eb; }
+
+        .main-card.theme-light-gray {
+            background-color: #f3f4f6; color: #1f2937;
+        }
+        .main-card.theme-light-gray .brand-red, .main-card.theme-light-gray .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-light-gray .prose > h4 + p::first-letter, .main-card.theme-light-gray .day-specific-content > p:first-child::first-letter { color: var(--brand-red); }
+        .main-card.theme-light-gray .text-stone-200, .main-card.theme-light-gray .litany-response { color: #4b5563; }
+        .main-card.theme-light-gray .tab-btn { color: #374151; }
+        .main-card.theme-light-gray .tab-btn.active { color: #111827; border-bottom-color: var(--brand-red); }
+        .main-card.theme-light-gray .border-white\/20, .main-card.theme-light-gray .litany-item { border-color: rgba(0,0,0,0.1); }
+        .main-card.theme-light-gray .brand-border { border-left-color: var(--brand-red); }
+        
+        .main-card.theme-red {
+            background-color: var(--brand-red); color: #f3f4f6;
+        }
+        .main-card.theme-red .brand-red, .main-card.theme-red .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-red .prose > h4 + p::first-letter, .main-card.theme-red .day-specific-content > p:first-child::first-letter { color: #ffffff; }
+        .main-card.theme-red .text-stone-200, .main-card.theme-red .litany-response { color: #e5e7eb; }
+        .main-card.theme-red .tab-btn { color: #e5e7eb; }
+        .main-card.theme-red .tab-btn.active { color: #ffffff; border-bottom-color: #ffffff; }
+        .main-card.theme-red .border-white\/20, .main-card.theme-red .litany-item { border-color: rgba(255,255,255,0.25); }
+        .main-card.theme-red .brand-border { border-left-color: #ffffff; }
+    </style>
+</head>
+<body class="text-stone-900 antialiased">
+
+    <!-- Container Principal -->
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+
+        <!-- Cabeçalho -->
+        <header class="text-center mb-6">
+            <img src="https://i.postimg.cc/ZRrzGs1g/Capa-para-facebook-arquitetura-moderno-vermelho-1.png" alt="Logo Corações Sagrados" class="mx-auto mb-4 w-full max-w-md rounded-md">
+        </header>
+
+        <!-- Navegação de Santos (Sempre Visível) -->
+        <div class="bg-gray-100/70 backdrop-blur-sm rounded-xl shadow-lg p-4 mb-8">
+            <h2 id="saints-nav-title" class="text-xl font-brand text-center text-gray-700 mb-4">Selecione a Novena</h2>
+            <nav id="month-nav" class="flex justify-center gap-6 mb-4 border-b border-gray-300 pb-3">
+                <button class="month-nav-btn text-lg font-brand text-gray-600" data-month="outubro">Outubro</button>
+                <button class="month-nav-btn text-lg font-brand text-gray-600" data-month="novembro">Novembro</button>
+            </nav>
+            <div id="saints-nav-container" class="saints-nav-container flex items-start gap-x-4 overflow-x-auto pb-2">
+                <!-- Santos serão inseridos aqui via JS -->
+            </div>
+        </div>
+
+        <!-- PÁGINA DA NOVENA (DETALHES) -->
+        <div id="novena-view">
+             <main id="main-card" class="main-card glass-card rounded-2xl p-6 md:p-10 theme-default">
+                
+                <!-- Seletor de Tema -->
+                <div class="theme-selector">
+                    <div class="theme-dot" data-theme="theme-dark-gray" style="background-color: #374151;" title="Tema Cinza Escuro"></div>
+                    <div class="theme-dot active" data-theme="theme-default" style="background-color: #949da4;" title="Tema Padrão"></div>
+                    <div class="theme-dot" data-theme="theme-light-gray" style="background-color: #f3f4f6;" title="Tema Cinza Claro"></div>
+                    <div class="theme-dot" data-theme="theme-red" style="background-color: #7c0909;" title="Tema Vermelho"></div>
+                </div>
+
+                <div id="novena-header" class="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-8 text-center sm:text-left">
+                    <!-- Imagem e título da novena serão inseridos aqui -->
+                </div>
+
+                <!-- Navegação por Abas -->
+                <nav id="tab-nav" class="flex flex-wrap justify-center border-b border-white/20 mb-8 -mx-2">
+                    <!-- Botões gerados via JS -->
+                </nav>
+
+                <!-- Conteúdo da Novena -->
+                <div id="tab-content-container">
+                    <!-- Dias da novena serão gerados aqui pelo JS -->
+                </div>
+            </main>
+        </div>
+
+        <!-- Rodapé -->
+        <footer class="text-center mt-8 text-stone-600">
+            <div class="flex justify-center items-center gap-4 mb-4">
+                <img src="https://i.postimg.cc/NGx77nBh/3-20250926-040914-0001.png" alt="Corações Sagrados Logo 1" class="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white">
+                <a href="https://lebrontech.github.io/Portfolio/" target="_blank" rel="noopener noreferrer" title="Visitar Portfólio LeBronDev-Designe™">
+                    <img src="https://i.postimg.cc/MHZBFWxC/4-20250926-040914-0002.png" alt="LeBronDev-Designe Logo" class="w-24 h-24 rounded-full object-cover shadow-md border-2 border-white transition-transform duration-200 hover:scale-105">
+                </a>
+            </div>
+
+            <!-- Ícones de Redes Sociais -->
+            <div class="flex justify-center items-center gap-6 my-6">
+                <a href="https://www.instagram.com/coracoessagradosbsb?igsh=MXFvaWJtcW1kZHFtNg==" target="_blank" rel="noopener noreferrer" class="text-[#E1306C] hover:opacity-80 transition-opacity duration-300" title="Siga-nos no Instagram">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12.315 2c-4.048 0-4.544.018-6.138.09-1.595.072-2.685.345-3.638.718a4.874 4.874 0 00-1.74 1.74c-.373.953-.647 2.043-.718 3.638C.018 7.77 0 8.266 0 12.315s.018 4.544.09 6.138c.072 1.595.345 2.685.718 3.638a4.874 4.874 0 001.74 1.74c.953.373 2.043.647 3.638.718 1.594.072 2.09.09 6.138.09s4.544-.018 6.138-.09c1.595-.072 2.685-.345 3.638-.718a4.874 4.874 0 001.74-1.74c.373-.953.647-2.043-.718-3.638.072-1.594.09-2.09.09-6.138s-.018-4.544-.09-6.138c-.072-1.595-.345-2.685-.718-3.638a4.874 4.874 0 00-1.74-1.74c-.953-.373-2.043-.647-3.638-.718C16.859 2.018 16.362 2 12.315 2zm0 1.802c4.004 0 4.475.016 6.06.088 1.487.067 2.37.332 3.01.57a3.072 3.072 0 011.14 1.14c.238.64.502 1.522.57 3.01.072 1.584.088 2.055.088 6.06s-.016 4.475-.088 6.06c-.067 1.487-.332 2.37-.57 3.01a3.072 3.072 0 01-1.14 1.14c-.64.238-1.522.502-3.01.57-1.584.072-2.055.088-6.06.088s-4.475-.016-6.06-.088c-1.487-.067-2.37-.332-3.01-.57a3.072 3.072 0 01-1.14-1.14c-.238-.64-.502-1.522-.57-3.01-.072-1.584-.088-2.055-.088-6.06s.016-4.475.088-6.06c.067-1.487.332-2.37.57-3.01a3.072 3.072 0 011.14-1.14c.64-.238 1.522-.502 3.01-.57C7.84 3.818 8.312 3.802 12.315 3.802zM12.315 7.37a5.185 5.185 0 100 10.37 5.185 5.185 0 000-10.37zm0 8.568a3.383 3.383 0 110-6.766 3.383 3.383 0 010 6.766zm6.18-8.94a1.21 1.21 0 100-2.42 1.21 1.21 0 000 2.42z" clip-rule="evenodd" /></svg>
+                    <span class="sr-only">Instagram</span>
+                </a>
+                <a href="https://chat.whatsapp.com/La88Os582PHKICHfuxFE09" target="_blank" rel="noopener noreferrer" class="text-[#25D366] hover:opacity-80 transition-opacity duration-300" title="Entre no nosso grupo do WhatsApp">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.79.46 3.48 1.32 4.95L2 22l5.25-1.42c1.41.79 3.02 1.22 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91S17.5 2 12.04 2zM17.23 15.25c-.22.62-1.33 1.14-1.62 1.18-.29.04-.62.06-1-.04-.38-.1-1.38-.51-2.63-1.53-1.65-1.34-2.7-2.97-2.82-3.13-.12-.16-.97-1.3-.97-2.5s.58-1.8.79-2.07c.21-.27.46-.34.62-.34.13 0 .28.01.41.03.13.02.3.04.46.3.16.26.58 1.4.63 1.51.05.11.08.24.03.38-.05.14-.08.21-.16.33-.08.12-.18.21-.26.3-.1.1-.19.2-.29.33-.1.13-.21.26-.09.5.12.24.58 1.03 1.25 1.64.85.75 1.58 1.02 1.8 1.09.22.07.35.06.48-.04.13-.1.54-.63.69-.83.15-.2.3-.31.48-.31.18 0 .9.44 1.05.52s.25.12.28.18c.03.06.03.35-.19.97z"/></svg>
+                    <span class="sr-only">WhatsApp</span>
+                </a>
+                 <a href="https://lebrontech.github.io/Portfolio/" target="_blank" rel="noopener noreferrer" class="text-[#333] hover:opacity-80 transition-opacity duration-300" title="Veja nosso trabalho no GitHub">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.165 6.839 9.49.5.092.682-.217.682-.482 0-.237-.009-.868-.014-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.03-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.82c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.378.203 2.398.1 2.65.64.7 1.028 1.595 1.028 2.688 0 3.848-2.338 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.578.688.48A10.001 10.001 0 0022 12c0-5.523-4.477-10-10-10z" clip-rule="evenodd" /></svg>
+                    <span class="sr-only">GitHub</span>
+                </a>
+            </div>
+
+            <p>&copy; 2025 Corações Sagrados. Todos os direitos reservados.</p>
+            <p class="mt-2 text-sm">
+                 <a href="https://lebrontech.github.io/Portfolio/" target="_blank" rel="noopener noreferrer" class="hover:text-sky-700 transition-colors">
+                    Desenvolvido por: LeBronDev-Designe™
+                 </a>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // --- BANCO DE DADOS DAS NOVENAS ---
+            const novenaData = {
+                // Novena de Santa Faustina
+                faustina: {
+                    saintName: "Santa Faustina",
+                    saintImage: "https://i.postimg.cc/qBKkbHTj/39a80df1d720976f7e55e00f40eadc90-1.jpg",
+                    novenaTitle: "Novena à Santa Faustina",
+                    description: "Peça a intercessão da secretária da Divina Misericórdia, Apóstola da Misericórdia.",
+                    days: [
+                        { day: "Primeiro Dia", title: "Felizes os que põem sua confiança em Deus", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>A alma que confiar na Minha misericórdia é a mais feliz, porque Eu mesmo cuido dela (D. 1273). Concedo-lhe a Minha confiança e dou-lhe tudo o que Me pede (D. 453).</p><p>Não compreendo como é possível não confiar Naquele que tudo pode. Com Ele tudo, e sem Ele — nada. Ele é o Senhor e não permitirá, nem consentirá, que sejam confundidos aqueles que puseram Nele toda a sua confiança (D. 358).</p></blockquote><p>Santa Faustina, obtende para mim a graça da filial confiança no Senhor Deus — que pode realizar todas as coisas. Ele é a própria Sabedoria e nos ama com um eterno amor.</p></div>` },
+                        { day: "Segundo Dia", title: "A confiança como resposta ao conhecimento do mistério da Misericórdia de Deus", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Tudo o que existe está encerrado nas entranhas da Minha misericórdia de uma forma mais profunda que a criança no ventre de sua mãe. Quanta dor Me causa a falta de confiança em Minha bondade. Os pecados que Me ferem mais dolorosamente são os de desconfiança (D. 1076).</p><p>Agora sei que até as almas escolhidas e avançadas na vida religiosa ou espiritual não têm a coragem de confiar plenamente em Deus. E isso acontece porque poucas almas conhecem a insondável misericórdia de Deus, a Sua grande bondade (D. 731).</p></blockquote><p>Santa Faustina, ajudai-me a mergulhar mais e mais profundamente no mistério da misericórdia de Deus; ajudai-me a descobrir a bondade de Deus de modo que eu possa confiar Nele cada vez mais e não O fira com minha desconfiança.</p></div>` },
+                        { day: "Terceiro Dia", title: "Fé", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>O que tu estás vendo na realidade estas alma veem pela fé. Oh! como Me é agradável a grande fé delas (D. 1420).</p><p>Peço ardentemente ao Senhor que se digne fortalecer a minha fé, para que, na vida cotidiana e monótona eu não me deixe levar pelas disposições humanas, mas pelo espírito. Oh! como tudo atrai o homem para a terra! Mas a fé viva mantém a alma em esferas mais elevadas, e designa para o amor próprio o lugar que lhe convém, isto é — o último (D. 210).</p></blockquote><p>Santa Faustina, obtende para mim uma fé forte e viva, a fim de que chegue a conhecer o amor misericordioso de Deus para com as criaturas, de modo que tanto mais eu O conheça, mais eu queira confiar Nele.</p></div>` },
+                        { day: "Quarto Dia", title: "Esperança", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Causam-Me grande alegria as almas que recorrem à Minha misericórdia. A estas almas concedo graças que excedem os seus pedidos (D. 1146).</p><p>Ainda que tivesse sobre a minha consciência os pecados do mundo inteiro e os pecados de todas as almas condenadas, não duvidaria da bondade de Deus, mas sem pensar me lançaria no abismo da misericórdia de Deus, que está sempre aberta para nós, e com o coração reduzido a pó, me lançaria a Seus pés, submetendo-me inteiramente à Sua santa vontade, que é a própria Misericórdia (D. 1552).</p></blockquote><p>Santa Faustina, obtende para mim uma esperança resoluta, de modo que, em meu caminho para o céu, eu possa sempre contar com o perdão de Deus e o auxílio de Sua graça em cada situação, particularmente nos momentos difíceis.</p></div>` },
+                        { day: "Quinto Dia", title: "Amor", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Sou o Amor e a própria Misericórdia e não existe miséria que possa medir-se com a Minha misericórdia, nem a miséria a esgotará, visto que à medida que se dá — aumenta (D.1273). Foi o amor que Me trouxe e o amor Me retém. Minha filha, se soubesses que grande mérito e recompensa tem um só ato de amor puro para Comigo, morrerias de alegria. Digo-te isso, para que te unas continuamente Comigo pelo amor (D. 576).</p><p>Amor, amor e mais uma vez amor a Deus! Superior a isso nada há nem no céu, nem na terra. O mais sublime é o amor a Deus, e a autêntica grandeza está em amá-Lo. Também a verdadeira sabedoria consiste nesse amor a Deus. Tudo o que é nobre e belo — está em Deus; fora de Deus não existe beleza nem grandeza (D. 990).</p></blockquote><p>Santa Faustina, obtende para mim um ardente amor para com Deus, a fim de que eu possa amá-Lo acima de todas as coisas, e amar todas as coisas por amor a Ele.</p></div>` },
+                        { day: "Sexto Dia", title: "Humildade", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Não são grandes prédios e magníficas instalações que Me dão satisfação, mas um coração puro e humilde (D. 532). As torrentes da Minha graça inundam as almas humildes. Os orgulhosos sempre estão na pobreza e miséria, porquanto a Minha graça afasta-se deles para as almas humildes (D. 1602).</p><p>Oh! como é bela a alma humilde. Deus nada nega a uma tal alma. Uma alma assim é onipotente, ela influi no destino do mundo inteiro. Deus exalta semelhante alma até o Seu trono e, quanto mais ela se rebaixa, tanto mais Deus se inclina para ela, persegue-a com Suas graças e a acompanha em todos os momentos com o Seu poder. Uma tal alma está unida com Deus da maneira mais profunda (D. 1306).</p></blockquote><p>Santa Faustina, obtende para mim a graça da verdadeira humildade, para que eu possa aceitar a verdade sobre Deus, sobre o mundo e sobre mim mesmo. Que isso possa me tornar mais confiante, como uma criança em relação ao seu Pai celeste, e me fazer reconhecer minha dependência Dele como Criador, Salvador e santificador.</p></div>` },
+                        { day: "Sétimo Dia", title: "Contrição", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Sou três vezes Santo e abomino o menor pecado. Não posso amar uma alma manchada pelo pecado, mas, quando se arrepende, não há limites para a Minha generosidade com ela. A Minha misericórdia a envolve e justifica. Com a Minha misericórdia persigo os pecadores em todos os seus caminhos, e o Meu Coração se alega quando eles voltam a Mim (D. 1728).</p><p>O que mais me faz sofrer é quando me encontro com a falsidade. Agora Vos compreendo, Salvador meu, por terdes repreendido tão severamente os fariseus pela hipocrisia. Procedestes mais bondosamente com pecadores empedernidos, quando recorriam a Vós com contrição (D. 1579).</p></blockquote><p>Santa Faustina, obtende para mim a graça da sincera contrição de todos os pecados, e mesmo da menor infidelidade, uma vez que isto foi a causa da terrível paixão de Jesus. Possa a contrição do meu coração alcançar-me o perdão da minha culpa e fortalecer a minha confiança na misericórdia de Deus.</p></div>` },
+                        { day: "Oitavo Dia", title: "Vontade de Deus", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>Minha filha, tu Me dás a maior glória pela paciente submissão à Minha vontade, e para ti acumulas tão grandes méritos que não o conseguirias nem com jejuns, nem com nenhuma espécie de mortificações. Deves saber, Minha filha, que, se submetes a tua vontade à Minha, atraís sobre ti a Minha especial predileção. Este sacrifício Me é agradável e cheio de doçura. Nele Me deleito, ele tem poder (D. 904).</p><p>O Senhor concedeu-me a luz de um conhecimento mais profundo da Sua vontade e, ao mesmo tempo, de uma total submissão a essa santa vontade de Deus. Essa luz me confirmou numa profunda paz, dando-me a compreensão de que nada devo temer, a não ser o pecado. Tudo o que Deus me enviar, o aceito com total submissão à Sua santa vontade. Onde quer que me coloque, procurarei cumprir fielmente a Sua santa vontade e fazer tudo aquilo que agrada a Ele, na medida em que estiver ao meu alcance, ainda que essa vontade de Deus seja para mim tão árdua e penosa (D. 1394). Submetendo-me inteiramente à Sua santa vontade, que é a própria Misericórdia (D. 1552).</p></blockquote><p>Santa Faustina, obtende para mim a graça de cumprir a vontade de Deus fielmente, sempre e em toda parte, de modo que, eu possa expressar minha confiança no Senhor Deus.</p></div>` },
+                        { day: "Nono Dia", title: "O Vaso da confiança", content: `<div class="day-specific-content"><blockquote class="brand-border pl-4 italic text-stone-200"><p>As graças da Minha misericórdia colhem-se com um único vaso, que é a confiança. Quanto mais a alma confiar, tanto mais receberá. Grande consolo Me dão as almas de ilimitada confiança, porque, em almas assim derramo todos os tesouros das Minhas graças (D. 1578).</p><p>Ó Senhor, meu amor, agradeço-Vos pelo dia de hoje, por me terdes permitido haurir tesouros de graças da fonte da Vossa insondável misericórdia. Ó Jesus, não apenas no dia de hoje, mas em cada instante colho da Vossa insondável misericórdia tudo o que a alma e o corpo possam desejar (D. 1178).</p></blockquote><p>Santa Faustina, ajudai-me a obter um largo vaso de confiança, a fim de que eu possa atrair com ele graças não apenas para mim mesmo, mas também para a Igreja, para a minha pátria, para o mundo inteiro, e especialmente para as almas que duvidam da misericórdia de Deus.</p></div>` }
+                    ],
+                    initialPrayer: `<div class="prose max-w-none"><h4 class="text-xl font-bold brand-red mb-2">Oração pedindo graças por intercessão de Santa Faustina</h4><p>Ó Jesus, que fizeste de Santa Faustina uma grande devota da Vossa ilimitada misericórdia, dignai-Vos, pela sua intercessão, se for do agrado da Vossa santíssima vontade, conceder-me a graça (…petição silenciosa) que Vos peço.</p><p>Eu, pecador, não sou digno da Vossa misericórdia. Peço-Vos, pois, pelo espírito de sacrifício e dedicação de Santa Faustina, e por sua intercessão, atendei os pedidos que, com confiança, Vos apresento.</p></div>`,
+                    finalPrayer: `<div class="prayers-section"><div class="w-16 h-px bg-white/20 my-8 mx-auto"></div><div class="prose max-w-none"><h4 class="text-xl font-bold brand-red mt-6 mb-2">Oração de agradecimento</h4><blockquote class="brand-border pl-4 italic text-stone-200"><p>“Ó Jesus, Deus eterno, agradeço-Vos pelas inúmeras graças e benefícios. Que cada batida do meu coração seja um novo hino de ação de graças para Convosco, ó Deus. Que cada gota do meu sangue circule por Vós, Senhor. A minha alma seja um só hino de adoração à Vossa Misericórdia. Amo-Vos, Deus, por Vós mesmo.” (Diário, 1794).</p></blockquote><p>Deus Misericordioso, acolhei os nosso agradecimentos pelo dom da vida e da missão de Santa Faustina, e ajudai-nos, com a sua intercessão, a crescer na atitude de confiança para Convosco e de misericórdia para com o próximo. Por Cristo Nosso Senhor. Amém.</p><div class="w-16 h-px bg-white/20 my-8 mx-auto"></div><h4 class="text-xl font-bold brand-red mt-6 mb-2">Ladainha de Santa Faustina</h4></div><ul class="list-none p-0 mt-4 text-sm md:text-base"><li class="litany-item"><span>Senhor, tende piedade de nós.</span> <span class="litany-response">Senhor...</span></li><li class="litany-item"><span>Cristo, tende piedade de nós.</span> <span class="litany-response">Cristo...</span></li><li class="litany-item"><span>Senhor, tende piedade de nós.</span> <span class="litany-response">Senhor...</span></li><li class="litany-item"><span>Jesus Cristo, ouvi-nos.</span> <span class="litany-response">Jesus Cristo, atendei-nos.</span></li><li class="litany-item"><span>Deus Pai do Céu,</span> <span class="litany-response">tende piedade de nós.</span></li><li class="litany-item"><span>Deus Filho Redentor do Mundo,</span> <span class="litany-response">tende piedade de nós.</span></li><li class="litany-item"><span>Deus Espírito Santo,</span> <span class="litany-response">tende piedade de nós.</span></li><li class="litany-item"><span>Santíssima Trindade que sois um só Deus,</span> <span class="litany-response">tende piedade de nós.</span></li><li class="litany-item"><span>Santa Maria</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, testemunha viva da misericórdia do Pai celeste</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, humilde serva de Jesus, Misericórdia Encarnada</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, instrumento obediente do Espírito Consolador</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, filha confiante da Mãe da Misericórdia</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, confidente da mensagem da misericórdia</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, secretária fiel das palavras de Jesus Misericordioso</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, grande Apóstola da Divina Misericórdia</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, dispensadora do Deus rico em Misericórdia</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, dom para todo o mundo</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, conhecedora da bondade de Deus por cada criatura</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, adoradora de Deus no mistério da Encarnação</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, participante da Paixão e Ressurreição do Senhor</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, guia sobre a estrada da Cruz de Jesus</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, que encontraste Jesus nos sacramentos</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, unida ao Esposo Divino na própria alma</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, iluminada pela Misericórdia de Deus na vida de Maria</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, amante da Igreja, Corpo Místico de Cristo</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, forte por uma verdadeira fé</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, constante na esperança inabalável</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, ardente de amor</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, bela por uma autêntica humildade</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, simples na confiança filial</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, exemplo de cumprimento da vontade de Deus</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, modelo de serviço e sacrifício</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, protetora afetuosa dos sacerdotes e dos religiosos</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, defensora das crianças e dos jovens contra o mal</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, refúgio dos desviados e desesperados</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, consolo para os doentes e sofredores</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, vítima sacrifical pelos pecadores</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, promotora da confiança nos corações dos agonizantes</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, preocupada com a salvação da humanidade</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, protetora das almas do purgatório</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Santa Faustina, que implora a misericórdia divina por todo o mundo</span> <span class="litany-response">rogai por nós.</span></li><li class="litany-item"><span>Cordeiro de Deus que tirais o pecado do mundo,</span> <span class="litany-response">perdoai-nos, Senhor!</span></li><li class="litany-item"><span>Cordeiro de Deus que tirais o pecado do mundo,</span> <span class="litany-response">ouvi-nos, Senhor!</span></li><li class="litany-item"><span>Cordeiro de Deus que tirais o pecado do mundo,</span> <span class="litany-response">tende piedade de nós.</span></li></ul><div class="prose max-w-none"><p class="mt-4">V. Rogai por nós, Santa Faustina,<br>Para que com a vida e com as palavras proclamemos ao mundo a mensagem da Misericórdia.</p><p class="mt-4 font-semibold">Pai-Nosso… Ave-Maria… Glória ao Pai…</p></div></div>`
+                },
+
+                // Novena de N.S. do Rosário
+                rosario: { 
+                    saintName: 'N. S. do Rosário',
+                    saintImage: 'https://i.postimg.cc/2669v1gr/nsr.jpg',
+                    novenaTitle: 'Novena a Nossa Senhora do Rosário', 
+                    description: 'Invoque a Mãe de Deus sob este título para que ela ajude você a rezar com mais devoção o Santo Rosário.',
+                    days: [
+                        { day: 'Primeiro Dia', title: '“Deus vos salve”', content: '<p>Quanto minha alma se alegra, amabilíssima Virgem, com as doces recordações que em mim desperta esta saudação! Enche-se de alegria meu coração ao dizer o “Ave-Maria”, para acompanhar a alegria que teve vosso Espírito ao escutar da boca do anjo, alegrando-me da eleição que de Vós fez o Onipotente para dar-nos o Senhor. Amém.</p>' },
+                        { day: 'Segundo Dia', title: '“Maria” nome Santo!', content: '<p>Dignai-vos, amabilíssima Mãe, selar com vosso nome a memória das súplicas nossas, dai-nos a esperança de que nos atenda benignamente vosso Filho Jesus, para que alcancemos o aborrecimento a todas as vaidades do mundo, firme amor a virtude, e ânsias contínuas de nossa eterna salvação. Amém.</p>' },
+                        { day: 'Terceiro Dia', title: '“Cheia sois de graça”', content: '<p>Doce Mãe! Deus Vos salve, Maria, sacrário riquíssimo em que descansou corporalmente a plenitude da Divindade: A vossos pés se apresenta desnuda minha pobre alma, pedindo a graça e o amor de Deus, com o que fostes enriquecida, fazendo-te cheia de virtude, cheia de santidade e cheia de graça. Amém.</p>' },
+                        { day: 'Quarto Dia', title: '“O Senhor é contigo”', content: '<p>Oh, Santíssima Virgem! Aquele imenso Senhor, que por sua essência fez todas as coisas, está em Vós e convosco por modo muito superior. Mãe minha, venha a nós o Senhor através de Vós. Mas, como tende vir a um coração de tão pouca limpeza como o meu Aquele Senhor que, para fazer de Vós sua habitação, quis com tal prodígio, que não se perdesse vossa virgindade sendo Mãe? Oh! Mora em nós tanta impureza, para que habite em nossa alma o Senhor. Amém.</p>' },
+                        { day: 'Quinto Dia', title: '“Bendita sois entre todas as mulheres”', content: '<p>Vós sois a glória de Jerusalém! Vós, a alegria de Israel! Vós, a honra do povo Santo de Deus! Obtende por vossa intercessão a nosso espírito a mais viva fé, para considerar e adorar com vosso Santo Rosário as misericórdias que em Vós e por Vós fez o Filho de Deus. Amém.</p>' },
+                        { day: 'Sexto Dia', title: '“Bendito é o fruto do teu ventre Jesus”', content: '<p>Choro, oh Mãe minha, que tenho eu feito tantos pecados, sabendo que eles fizeram morrer na cruz a vosso Filho. Seja o fruto de minha oração, que não termine nunca de chorá-los, até poder bendizer eternamente aquele puríssimo fruto de vosso ventre. Amém.</p>' },
+                        { day: 'Sétimo Dia', title: '“Santa Maria, Mãe de Deus”', content: '<p>Não permitais que se perca minha alma comprada com o inestimável preço do sangue de Jesus. Dai-me um coração digno de Vós, para que amando-vos, sejam minhas delícias obsequiar-vos com o Santo Rosário, adorando com ele ao vosso Filho, pelo muito que fez para nossa redenção e pelo que desejou, fazendo-te sua Mãe. Amém.</p>' },
+                        { day: 'Oitavo Dia', title: '“Rogai por nós pecadores”', content: '<p>Mãe de piedade! A Vós peço, Mãe do Rei soberano da glória: Vós sois minha Mãe. Alcançai-me humildade e plena confiança, pois deste modo, com o auxílio de Deus, a receber os favores da Divina misericórdia, pelos méritos de vosso Filho e Redentor nosso. Amém.</p>' },
+                        { day: 'Nono Dia', title: '“Agora, e na hora de nossa morte”', content: '<p>Estamos sempre prestes a perder a graça de Deus. Fazei com que não se aparte de minha memória ao último momento da vida, que haverá de ser decisivo de minha eterna sorte. Oh, Mãe de piedade! Concedei-me a esperança de morrer sob vossa proteção e no amor de meu Jesus. Amém.</p>' }
+                    ],
+                    initialPrayer: `<div class="prayers-section"><h4 class="text-xl font-bold brand-red mb-2">ORAÇÃO INICIAL</h4><p>Oh, Mãe e clementíssima Virgem do Rosário! Vós que plantastes na Igreja, por meio de vosso privilegiado filho Domingos, o místico remédio do Santo Rosário, fazei que abracemos todos tua santa devoção e obtenhamos seu verdadeiro espírito; De sorte que aquelas místicas rosas sejam em nossos lábios e coração, pelos pecadores, medicina, e pelos justos, aumento de graça. Amém.</p><p class="italic text-stone-200 my-4">Pedir aqui com confiança a graça que se deseja obter com esta novena.</p></div>`,
+                    finalPrayer: `<div class="prayers-section"><div class="w-16 h-px bg-white/20 my-6 mx-auto"></div><h4 class="text-xl font-bold brand-red mb-2">ORAÇÕES FINAIS</h4><p>Rezar quatro Ave-Marias e Glórias.</p><p class="mt-2"><strong>Oração:</strong> Oh, Santíssima Virgem, Mãe de Deus, doce refúgio e esperança piedosa de todos os aflitos! Por aquela confiança e autoridade de Mãe com que podeis apresentar nossos rogos ao que é árbitro soberano de nosso bem, empenhai uma e outra em favor nosso. Consegui-nos o reformar com o Santo Rosário nossas vidas, estudando em tão doce livro a fiel imitação de vosso Filho Jesus, até que possamos adorá-Lo e amá-Lo por todos os séculos dos séculos. Amém.</p></div>`
+                },
+
+                aparecida: { novenaTitle: 'Novena a Nossa Senhora Aparecida', description: 'Padroeira do Brasil, a Novena de Nossa Senhora Aparecida é a preparação para a grande Festa do Dia 12 de Outubro.' },
+                teresa_avila: { novenaTitle: 'Novena a Santa Teresa de Jesus (Ávila)', description: 'Padroeira dos místicos e Doutora da Igreja, Santa Teresa intercede para que possamos aprofundar nossa vida de oração.' },
+                margarida_alacoque: { novenaTitle: 'Novena a Santa Margarida Maria Alacoque', description: 'A grande mensageira do Sagrado Coração de Jesus, Santa Margarida intercede pela devoção e reparação ao Coração de Cristo.' },
+                geraldo_majela: { novenaTitle: 'Novena a São Geraldo Majela', description: 'Padroeiro das gestantes e dos partos felizes, São Geraldo intercede pela proteção da maternidade e das famílias.' },
+                inacio_antioquia: { novenaTitle: 'Novena a Santo Inácio de Antioquia', description: 'Bispo e mártir dos primeiros séculos, Santo Inácio intercede pela unidade da Igreja e pela fidelidade à fé.' },
+                pedro_alcantara: { novenaTitle: 'Novena a São Pedro de Alcântara', description: 'Reformador da Ordem Franciscana e grande penitente, São Pedro intercede pela conversão e pela busca da santidade.' },
+                jp2: { novenaTitle: 'Novena a São João Paulo II', description: 'Papa e santo, São João Paulo II é um poderoso intercessor pela família, pela juventude e pela liberdade.' },
+                frei_galvao: { novenaTitle: 'Novena a Santo Antônio Galvão', description: 'O primeiro santo brasileiro, Frei Galvão intercede por todos que buscam a saúde do corpo e da alma, especialmente com suas pílulas.' },
+                judas_tadeu: { novenaTitle: 'Novena a São Judas Tadeu', description: 'Considerado o advogado das causas desesperadas, São Judas intercede por todos que enfrentam grandes dificuldades.' },
+                todos_santos: { novenaTitle: 'Novena a Todos os Santos', description: 'Prepare-se para a grande Festa de Todos os Santos e peça a intercessão de todos aqueles que já estão no Céu.' },
+            };
+
+            const saintsByMonth = {
+                outubro: [
+                    { id: 'faustina', name: 'Santa Faustina', image: 'https://i.postimg.cc/qBKkbHTj/39a80df1d720976f7e55e00f40eadc90-1.jpg', startDate: '26/Set', endDate: '04/Out', feastDay: '05/Out' },
+                    { id: 'rosario', name: 'N. S. do Rosário', image: 'https://i.postimg.cc/2669v1gr/nsr.jpg', startDate: '28/Set', endDate: '06/Out', feastDay: '07/Out' },
+                    { id: 'aparecida', name: 'N. S. Aparecida', image: 'https://i.postimg.cc/Zn3jMzpz/Pin-de-Alzira-Mattos-em-RELIGIOSO-Nosssa-senhora.jpg', startDate: '03/Out', endDate: '11/Out', feastDay: '12/Out' },
+                    { id: 'teresa_avila', name: 'Sta. Teresa de Ávila', image: 'https://placehold.co/80x80/ccc/7c0909?text=STA', startDate: '06/Out', endDate: '14/Out', feastDay: '15/Out' },
+                    { id: 'margarida_alacoque', name: 'Sta. Margarida M.A.', image: 'https://placehold.co/80x80/ccc/7c0909?text=SMA', startDate: '07/Out', endDate: '15/Out', feastDay: '16/Out' },
+                    { id: 'geraldo_majela', name: 'São Geraldo', image: 'https://placehold.co/80x80/ccc/7c0909?text=SG', startDate: '07/Out', endDate: '15/Out', feastDay: '16/Out' },
+                    { id: 'inacio_antioquia', name: 'Sto. Inácio de A.', image: 'https://placehold.co/80x80/ccc/7c0909?text=SIA', startDate: '08/Out', endDate: '16/Out', feastDay: '17/Out' },
+                    { id: 'pedro_alcantara', name: 'São Pedro de A.', image: 'https://placehold.co/80x80/ccc/7c0909?text=SPA', startDate: '10/Out', endDate: '18/Out', feastDay: '19/Out' },
+                    { id: 'jp2', name: 'São João Paulo II', image: 'https://placehold.co/80x80/ccc/7c0909?text=JP+II', startDate: '13/Out', endDate: '21/Out', feastDay: '22/Out' },
+                    { id: 'frei_galvao', name: 'Sto. Antônio Galvão', image: 'https://placehold.co/80x80/ccc/7c0909?text=SAG', startDate: '16/Out', endDate: '24/Out', feastDay: '25/Out' },
+                    { id: 'judas_tadeu', name: 'São Judas Tadeu', image: 'https://placehold.co/80x80/ccc/7c0909?text=SJT', startDate: '19/Out', endDate: '27/Out', feastDay: '28/Out' },
+                    { id: 'todos_santos', name: 'Todos os Santos', image: 'https://placehold.co/80x80/ccc/7c0909?text=TS', startDate: '23/Out', endDate: '31/Out', feastDay: '01/Nov' },
+                ],
+                novembro: [
+                    { id: 'almas', name: 'Almas', image: 'https://placehold.co/80x80/ccc/7c0909?text=Almas', startDate: '24/Out', endDate: '01/Nov', feastDay: '02/Nov' },
+                    { id: 'gracas', name: 'N. S. das Graças', image: 'https://placehold.co/80x80/ccc/7c0909?text=NSG', startDate: '18/Nov', endDate: '26/Nov', feastDay: '27/Nov' }
+                ]
+            };
+            
+            // --- ELEMENTOS DO DOM ---
+            const saintsNavContainer = document.getElementById('saints-nav-container');
+            const monthNavButtons = document.querySelectorAll('.month-nav-btn');
+            const saintsNavTitle = document.getElementById('saints-nav-title');
+
+            // --- FUNÇÕES ---
+            function setActiveSaint(novenaId) {
+                document.querySelectorAll('.saint-nav-item').forEach(el => {
+                    el.classList.remove('active');
+                    if(el.dataset.novenaId === novenaId) {
+                        el.classList.add('active');
+                        // Centraliza o item ativo na barra de rolagem
+                        el.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                    }
+                });
+            }
+            
+            function renderSaintsNav(month) {
+                saintsNavTitle.textContent = `Novenas de ${month.charAt(0).toUpperCase() + month.slice(1)}`;
+                saintsNavContainer.innerHTML = ''; // Limpa a navegação
+                const saints = saintsByMonth[month] || [];
+                saints.forEach(saint => {
+                    const saintEl = document.createElement('div');
+                    saintEl.className = 'saint-nav-item flex flex-col items-center gap-1 text-center';
+                    saintEl.dataset.novenaId = saint.id;
+                    saintEl.innerHTML = `
+                        <img src="${saint.image}" alt="${saint.name}" class="w-20 h-20 rounded-full object-cover shadow-md">
+                        <p class="text-sm font-semibold text-gray-700 font-brand leading-tight mt-1">${saint.name}</p>
+                        <p class="text-xs text-gray-500">Início: ${saint.startDate}</p>
+                        <div class="date-badge mt-1">Dia ${saint.feastDay.split('/')[0]}</div>
+                    `;
+                    saintsNavContainer.appendChild(saintEl);
+                });
+            }
+
+            function renderNovena(novenaId) {
+                const data = novenaData[novenaId];
+                const saintInfo = Object.values(saintsByMonth).flat().find(s => s.id === novenaId);
+                
+                if (!data || !data.days) {
+                    const title = data ? data.novenaTitle : (saintInfo ? saintInfo.name : "Novena");
+                    alert(`O conteúdo da ${title} ainda não está disponível.`);
+                    return;
+                };
+
+                const novenaHeader = document.getElementById('novena-header');
+                const tabNav = document.getElementById('tab-nav');
+                const tabContentContainer = document.getElementById('tab-content-container');
+
+                // Limpa conteúdo anterior
+                novenaHeader.innerHTML = ''; tabNav.innerHTML = ''; tabContentContainer.innerHTML = '';
+                
+                novenaHeader.innerHTML = `
+                    <img src="${data.saintImage}" alt="${data.saintName}" class="w-28 h-28 md:w-32 md:h-32 rounded-full object-cover border-2 border-stone-400/50 shadow-lg flex-shrink-0">
+                    <div>
+                        <h2 class="text-3xl md:text-4xl font-bold brand-red">${data.novenaTitle}</h2>
+                        <p class="text-stone-200 italic mt-1">${data.description || ''}</p>
+                        ${saintInfo ? `<div class="mt-3"><span class="date-badge">Novena: ${saintInfo.startDate} a ${saintInfo.endDate}</span></div>` : ''}
+                    </div>
+                `;
+
+                data.days.forEach((dayData, index) => {
+                    const i = index + 1;
+                    const button = document.createElement('button');
+                    button.className = 'tab-btn py-3 px-4 text-sm md:text-base';
+                    button.textContent = `Dia ${i}`;
+                    button.dataset.target = `day-${i}`;
+                    tabNav.appendChild(button);
+                    
+                    const contentDiv = document.createElement('div');
+                    contentDiv.id = `day-${i}`;
+                    contentDiv.className = 'tab-content';
+                    // Combina o conteúdo específico do dia com as orações comuns da novena
+                    contentDiv.innerHTML = `
+                        <div class="prose max-w-none">
+                            <div class="day-specific-content">
+                                ${data.initialPrayer || ''}
+                            </div>
+                            
+                            <div class="w-16 h-px bg-white/20 my-8 mx-auto"></div>
+
+                            <h3 class="text-2xl font-bold brand-red mb-2">${dayData.day}</h3>
+                            <p class="text-xl italic text-stone-200 mb-4">${dayData.title}</p>
+                            <div class="day-specific-content">
+                                ${dayData.content}
+                            </div>
+
+                            ${data.finalPrayer || ''}
+                        </div>
+                    `;
+                    tabContentContainer.appendChild(contentDiv);
+                });
+                
+                setupTabLogic();
+                setActiveSaint(novenaId);
+                // Rola a página suavemente para o card da novena
+                const cardTop = document.getElementById('main-card').getBoundingClientRect().top + window.pageYOffset - 20;
+                window.scrollTo({ top: cardTop, behavior: 'smooth' });
+            }
+
+            function setupTabLogic() {
+                const tabButtons = document.querySelectorAll('#novena-view .tab-btn');
+                const tabContents = document.querySelectorAll('#novena-view .tab-content');
+
+                function switchTab(targetId) {
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    tabButtons.forEach(button => button.classList.remove('active'));
+                    document.getElementById(targetId).classList.add('active');
+                    document.querySelector(`.tab-btn[data-target="${targetId}"]`).classList.add('active');
+                }
+
+                tabButtons.forEach(button => {
+                    button.addEventListener('click', () => switchTab(button.dataset.target));
+                });
+                
+                if (tabButtons.length > 0) switchTab('day-1');
+            }
+
+            // --- EVENT LISTENERS ---
+            monthNavButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    monthNavButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    renderSaintsNav(button.dataset.month);
+                });
+            });
+
+            saintsNavContainer.addEventListener('click', function(e) {
+                const story = e.target.closest('.saint-nav-item');
+                if (story && story.dataset.novenaId) {
+                    renderNovena(story.dataset.novenaId);
+                }
+            });
+
+            const mainCard = document.getElementById('main-card');
+            const themeDots = document.querySelectorAll('.theme-dot');
+            const themeClasses = ['theme-default', 'theme-dark-gray', 'theme-light-gray', 'theme-red'];
+            themeDots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    const selectedTheme = dot.dataset.theme;
+                    mainCard.classList.remove(...themeClasses);
+                    mainCard.classList.add(selectedTheme);
+                    themeDots.forEach(d => d.classList.remove('active'));
+                    dot.classList.add('active');
+                });
+            });
+
+            // --- INICIALIZAÇÃO DA PÁGINA ---
+            function initializePage() {
+                // Define o mês inicial como Outubro, pois temos a lista.
+                const initialMonth = 'outubro';
+                
+                document.querySelector(`.month-nav-btn[data-month="${initialMonth}"]`).classList.add('active');
+                renderSaintsNav(initialMonth);
+                
+                // Carrega a primeira novena da lista inicial (Santa Faustina)
+                renderNovena(saintsByMonth[initialMonth][0].id);
+            }
+
+            initializePage();
+        });
+    </script>
+
+</body>
+</html>
+
