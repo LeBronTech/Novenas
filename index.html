@@ -28,35 +28,25 @@
         }
         
         /* --- NAVEGAÇÃO GLOBAL DE SANTOS --- */
-        /* Novo estilo Gótico para a barra de rolagem */
         .saints-nav-container {
             scrollbar-width: auto;
-            scrollbar-color: var(--brand-red) #e5e7eb; /* Cor do polegar e da trilha */
+            scrollbar-color: var(--brand-red) #e5e7eb;
         }
-        .saints-nav-container::-webkit-scrollbar {
-            height: 10px;
-        }
-        .saints-nav-container::-webkit-scrollbar-track {
-            background: #e5e7eb; /* Fundo da trilha (cinza claro) */
-        }
+        .saints-nav-container::-webkit-scrollbar { height: 10px; }
+        .saints-nav-container::-webkit-scrollbar-track { background: #e5e7eb; }
         .saints-nav-container::-webkit-scrollbar-thumb {
-            background-color: var(--brand-red); /* Cor do polegar (vermelho) */
-            border-radius: 0; /* Cantos retos */
+            background-color: var(--brand-red);
+            border-radius: 0;
         }
 
         .saint-nav-item {
             transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
             cursor: pointer;
-            flex-shrink: 0; /* Impede que os itens encolham */
+            flex-shrink: 0;
             width: 100px;
         }
-        .saint-nav-item:not(.active) {
-            opacity: 0.7;
-        }
-        .saint-nav-item:hover {
-            opacity: 1;
-            transform: scale(1.05);
-        }
+        .saint-nav-item:not(.active) { opacity: 0.7; }
+        .saint-nav-item:hover { opacity: 1; transform: scale(1.05); }
         .saint-nav-item img {
             border: 4px solid transparent;
             transition: border-color 0.3s ease;
@@ -70,8 +60,8 @@
         .month-nav-btn {
             transition: all 0.2s ease-in-out;
             border-bottom: 3px solid transparent;
-            font-weight: 700; /* bold */
-            padding-bottom: 0.25rem; /* pb-1 */
+            font-weight: 700;
+            padding-bottom: 0.25rem;
         }
         .month-nav-btn.active, .month-nav-btn:hover {
             border-bottom-color: var(--brand-red);
@@ -126,23 +116,17 @@
             box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.9);
         }
         
-        /* Balão de Data */
         .date-badge {
             background-color: var(--brand-red);
             color: white;
-            padding: 4px 16px;
-            border-radius: 9999px; /* pill shape */
-            font-size: 0.875rem; /* 14px */
-            font-weight: bold;
-            display: inline-block;
-            text-align: center;
+            padding: 4px 16px; border-radius: 9999px;
+            font-size: 0.875rem; font-weight: bold;
+            display: inline-block; text-align: center;
             line-height: 1.5;
         }
-
+        
         /* --- DEFINIÇÕES DOS TEMAS --- */
-        .main-card.theme-default {
-            background-color: #949da4; color: #fafafa;
-        }
+        .main-card.theme-default { background-color: #949da4; color: #fafafa; }
         .main-card.theme-default .brand-red, .main-card.theme-default .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-default .prose > h4 + p::first-letter, .main-card.theme-default .day-specific-content > p:first-child::first-letter { color: var(--brand-red); }
         .main-card.theme-default .text-stone-200, .main-card.theme-default .litany-response { color: #e7e5e4; }
         .main-card.theme-default .tab-btn { color: #e7e5e4; }
@@ -150,9 +134,7 @@
         .main-card.theme-default .border-white\/20, .main-card.theme-default .litany-item { border-color: rgba(255,255,255,0.2); }
         .main-card.theme-default .brand-border { border-left-color: var(--brand-red); }
 
-        .main-card.theme-dark-gray {
-            background-color: #374151; color: #f3f4f6;
-        }
+        .main-card.theme-dark-gray { background-color: #374151; color: #f3f4f6; }
         .main-card.theme-dark-gray .brand-red, .main-card.theme-dark-gray .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-dark-gray .prose > h4 + p::first-letter, .main-card.theme-dark-gray .day-specific-content > p:first-child::first-letter { color: #e5e7eb; }
         .main-card.theme-dark-gray .text-stone-200, .main-card.theme-dark-gray .litany-response { color: #d1d5db; }
         .main-card.theme-dark-gray .tab-btn { color: #d1d5db; }
@@ -160,9 +142,7 @@
         .main-card.theme-dark-gray .border-white\/20, .main-card.theme-dark-gray .litany-item { border-color: rgba(255,255,255,0.2); }
         .main-card.theme-dark-gray .brand-border { border-left-color: #e5e7eb; }
 
-        .main-card.theme-light-gray {
-            background-color: #f3f4f6; color: #1f2937;
-        }
+        .main-card.theme-light-gray { background-color: #f3f4f6; color: #1f2937; }
         .main-card.theme-light-gray .brand-red, .main-card.theme-light-gray .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-light-gray .prose > h4 + p::first-letter, .main-card.theme-light-gray .day-specific-content > p:first-child::first-letter { color: var(--brand-red); }
         .main-card.theme-light-gray .text-stone-200, .main-card.theme-light-gray .litany-response { color: #4b5563; }
         .main-card.theme-light-gray .tab-btn { color: #374151; }
@@ -170,9 +150,7 @@
         .main-card.theme-light-gray .border-white\/20, .main-card.theme-light-gray .litany-item { border-color: rgba(0,0,0,0.1); }
         .main-card.theme-light-gray .brand-border { border-left-color: var(--brand-red); }
         
-        .main-card.theme-red {
-            background-color: var(--brand-red); color: #f3f4f6;
-        }
+        .main-card.theme-red { background-color: var(--brand-red); color: #f3f4f6; }
         .main-card.theme-red .brand-red, .main-card.theme-red .prose > blockquote:first-of-type + p::first-letter, .main-card.theme-red .prose > h4 + p::first-letter, .main-card.theme-red .day-specific-content > p:first-child::first-letter { color: #ffffff; }
         .main-card.theme-red .text-stone-200, .main-card.theme-red .litany-response { color: #e5e7eb; }
         .main-card.theme-red .tab-btn { color: #e5e7eb; }
@@ -440,7 +418,8 @@
                 
                 setupTabLogic();
                 setActiveSaint(novenaId);
-                // Rola a página suavemente para o card da novena
+                history.pushState({novenaId: novenaId}, '', '#' + novenaId);
+                
                 const cardTop = document.getElementById('main-card').getBoundingClientRect().top + window.pageYOffset - 20;
                 window.scrollTo({ top: cardTop, behavior: 'smooth' });
             }
@@ -494,20 +473,33 @@
 
             // --- INICIALIZAÇÃO DA PÁGINA ---
             function initializePage() {
-                // Define o mês inicial como Outubro, pois temos a lista.
-                const initialMonth = 'outubro';
+                const hash = window.location.hash.substring(1);
+                let initialMonth = 'outubro';
+                let initialNovenaId = saintsByMonth[initialMonth][0].id;
+
+                if (hash) {
+                    for (const month in saintsByMonth) {
+                        if (saintsByMonth[month].some(saint => saint.id === hash)) {
+                            initialMonth = month;
+                            initialNovenaId = hash;
+                            break;
+                        }
+                    }
+                }
                 
+                monthNavButtons.forEach(btn => btn.classList.remove('active'));
                 document.querySelector(`.month-nav-btn[data-month="${initialMonth}"]`).classList.add('active');
                 renderSaintsNav(initialMonth);
                 
-                // Carrega a primeira novena da lista inicial (Santa Faustina)
-                renderNovena(saintsByMonth[initialMonth][0].id);
+                renderNovena(initialNovenaId);
             }
-
+            
+            window.addEventListener('popstate', initializePage);
             initializePage();
         });
     </script>
 
 </body>
 </html>
+" selected by the user, and the user's query is "remova a funcionalidade gemini, e eu quero que mude o link do site cada vez que eu clicar em uma novena diferente".
 
